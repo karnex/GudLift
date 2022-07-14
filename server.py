@@ -3,12 +3,14 @@ from flask import Flask, render_template, request, redirect, flash, url_for
 
 
 def load_clubs():
+    """ Return the content of clubs.json containing name, email and points of each user """
     with open('clubs.json') as c:
         list_of_clubs = json.load(c)['clubs']
         return list_of_clubs
 
 
 def load_competitions():
+    """ Return the content of competitions.json containing name, date and number of places of each competition """
     with open('competitions.json') as comps:
         list_of_competitions = json.load(comps)['competitions']
         return list_of_competitions
@@ -23,17 +25,20 @@ clubs = load_clubs()
 
 @app.route('/')
 def index():
+    """ Login page """
     return render_template('index.html')
 
 
 @app.route('/show_summary', methods=['POST'])
 def show_summary():
+    """ Show a summary of club and competitions data """
     club = [club for club in clubs if club['email'] == request.form['email']][0]
     return render_template('welcome.html', club=club, competitions=competitions)
 
 
 @app.route('/book/<competition>/<club>')
-def book(competition,club):
+def book(competition, club):
+    """ Book place of a competition """
     found_club = [c for c in clubs if c['name'] == club][0]
     found_competition = [c for c in competitions if c['name'] == competition][0]
     if found_club and found_competition:
@@ -45,6 +50,7 @@ def book(competition,club):
 
 @app.route('/purchase_places', methods=['POST'])
 def purchase_places():
+    """ Purchase places of competition """
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     places_required = int(request.form['places'])
@@ -58,4 +64,5 @@ def purchase_places():
 
 @app.route('/logout')
 def logout():
+    """ Disconnect session of the current user """
     return redirect(url_for('index'))
